@@ -8,5 +8,6 @@ urlpatterns = [
     path('update/<int:pk>',views.UpdatePost.as_view(),name="update"),
     path('delete/<int:pk>',views.DeletePost.as_view(),name='delete'),
     path('post/',views.PostFormView.as_view(),name="post"),
-    path('detail/<int:pk>/comment',views.CommentonPost.as_view(),name="comment")
+    path('detail/<int:pk>/comment',views.CommentonPost.as_view(),name="comment"),
+    path('detail/<int:pk1>/comment/delete/<int:pk2>',views.DeleteComment.as_view(),name="cmntdelete"),
 ]
