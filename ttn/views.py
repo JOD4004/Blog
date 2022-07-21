@@ -46,7 +46,7 @@ class CommentonPost(LoginRequiredMixin, CreateView):
             messages.info(request,'You have already commented on the post')
             return HttpResponseRedirect("/") 
         return super(CommentonPost, self).dispatch(request, *args, **kwargs)
-    def form_valid(self,form):
+    def form_valid(self, form):
         form.instance.post_id=self.kwargs['pk']
         form.instance.user=self.request.user
         form.save()
@@ -61,10 +61,16 @@ class UpdatePost(LoginRequiredMixin, UpdateView):
     form_class = PostForm
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
-        obj.img.delete(False)
         if obj.author != self.request.user:
-            return HttpResponseRedirect('/')
+            
+            return HttpResponseRedirect('detail')
         return super(UpdatePost, self).dispatch(request, *args, **kwargs)
+    def form_valid(self,form):
+        obj = self.get_object()
+        obj.img.delete(False)
+        form.save()
+        return super().form_valid(form)
+    
 
 #Delete Posts
 class DeletePost(DeleteView):
@@ -75,6 +81,17 @@ class DeletePost(DeleteView):
         messages.info(request,'Click Update if you want to delete the post')
         return super(DeletePost, self).dispatch(request, *args, **kwargs)
 
+#Delete Your Comment
+class DeleteComment(DeleteView):
+    model = Comment
+    success_url ="/"
+    def get_object(self):
+        return Comment.objects.filter(post_id=self.kwargs.get("pk1"), user_id=self.kwargs.get("pk2"))
+    def dispatch(self, request,*args, **kwargs):
+        obj = self.get_object()
+        obj.delete()
+        messages.info(request,'Comment deleted')
+        return HttpResponseRedirect("/")
 
 #Posting new datas
 class PostFormView(LoginRequiredMixin,CreateView):
